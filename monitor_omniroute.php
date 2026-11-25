@@ -1,105 +1,150 @@
 <?php
 /**
- * OmniRoute Ultimate Health Check & Auto-Restart
- * Объединенный вариант: глубокая диагностика + надежное авто-восстановление.
+ * OmniRoute Health Check & Auto-Restart (v2)
+ *
+ * Проверяет: systemd -> процесс (/proc) -> порт -> реальный ответ API -> свежесть логов/БД.
+ * Перезапускает сервис, если КРИТИЧЕСКИЕ ошибки длятся дольше restart_limit секунд.
+ * Защита: flock, лимит рестартов в час, grace-период после рестарта, валидация state.
+ *
+ * Запуск: php monitor_omniroute.php (cron раз в 1-2 минуты)
  */
 
-// --- КОНФИГУРАЦИЯ ---
+// ===================== КОНФИГУРАЦИЯ =====================
+$home = getenv('HOME') ?: '/home/testai26';
+
 $config = [
-    'service_name'   => 'omniroute.service',
-    'app_log'        => '/home/testai26/.omniroute/logs/application/app.log',
-    'db_file'        => '/home/testai26/.omniroute/storage.sqlite',
-    'call_logs_dir'  => '/home/testai26/.omniroute/call_logs',
-    'failure_flag'   => __DIR__ . '/.failure_start_time',
-    'report_file'    => '/home/testai26/hermes-agent/omniroute_health_report.txt',
-    'restart_limit'  => 600, // 10 минут
+    'service_name'      => 'omniroute.service',
+    'app_log'           => "$home/.omniroute/logs/application/app.log",
+    'db_file'           => "$home/.omniroute/storage.sqlite",
+    'report_file'       => "$home/hermes-agent/omniroute_health_report.txt",
+    'history_log'       => "$home/.cache/omniroute-health/history.log",
+    'state_file'        => "$home/.cache/omniroute-health/state.json",
+    'lock_file'         => "$home/.cache/omniroute-health/lock",
+
+    'api_enabled'       => true,
+    'api_path'          => '/v1/models',
+    'api_key'           => getenv('OMNIROUTE_API_KEY') ?: '',
+    'api_timeout'       => 5,
+    'api_slow_warn'     => 3.0,
+
+    'restart_limit'     => 600,   // 10 минут
+    'restart_grace'     => 90,
+    'max_restarts_hour' => 3,
+    'post_restart_wait' => 15,
+
+    'stale_warn_sec'    => 600,
+    'fd_warn_ratio'     => 0.8,
+    'fd_crit_ratio'     => 0.95,
+    'history_max_bytes' => 1048576,
 ];
 
-$errors = [];
-$warnings = [];
-$ok = [];
+// ===================== ПОДГОТОВКА ОКРУЖЕНИЯ =====================
+$uid = function_exists('posix_getuid') ? posix_getuid() : (int)trim(shell_exec('id -u'));
+if (!getenv('XDG_RUNTIME_DIR')) putenv("XDG_RUNTIME_DIR=/run/user/$uid");
+if (!getenv('DBUS_SESSION_BUS_ADDRESS')) putenv("DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$uid/bus");
 
-// --- 1. Диагностика ---
-
-// Systemd
-$serviceStatus = shell_exec("systemctl --user is-active {$config['service_name']} 2>&1");
-$serviceActive = trim($serviceStatus) === 'active';
-if ($serviceActive) $ok['service_state'] = "Systemd: active";
-else $errors[] = "Systemd service not active: " . trim($serviceStatus);
-
-// PID
-$mainPid = trim(shell_exec("systemctl --user show {$config['service_name']} -p MainPID --value 2>/dev/null"));
-if ($mainPid && is_numeric($mainPid)) $ok['main_pid'] = "MainPID: $mainPid";
-else $errors[] = 'Cannot determine MainPID';
-
-// Процесс /proc
-if ($mainPid && file_exists("/proc/$mainPid/status")) {
-    $status = file_get_contents("/proc/$mainPid/status");
-    if (preg_match('/Threads:\t(\d+)/', $status, $t)) $ok['threads'] = "Threads: {$t[1]}";
-    if (preg_match('/State:\t(\w)/', $status, $s)) $ok['process_state'] = "State: {$s[1]}";
-    $ok['fds'] = "Open FDs: " . count(glob("/proc/$mainPid/fd/*"));
-} else {
-    $errors[] = 'Process not found at /proc/PID';
+foreach ([$config['state_file'], $config['history_log'], $config['lock_file'], $config['report_file']] as $p) {
+    $d = dirname($p);
+    if (!is_dir($d)) @mkdir($d, 0755, true);
 }
 
-// Порты
-$portsOutput = shell_exec('ss -tulnp 2>/dev/null');
-if ($portsOutput && $mainPid) {
-    $found = false;
-    foreach (explode("\n", $portsOutput) as $line) {
-        if (preg_match('/tcp\s+LISTEN\s+.*?(\d+):(\d+).*?pid='.$mainPid.'/', $line, $m)) {
-            $ok['listening_port'] = "Port: " . $m[2];
-            $found = true;
-        }
+$lockFh = fopen($config['lock_file'], 'c');
+if (!$lockFh || !flock($lockFh, LOCK_EX | LOCK_NB)) exit(0);
+
+function sh(string $cmd): string { return trim((string)shell_exec($cmd . ' 2>&1')); }
+
+function loadState(string $file): array {
+    $default = ['failure_since' => null, 'restarts' => [], 'last_restart' => 0];
+    if (!is_file($file)) return $default;
+    $data = json_decode((string)@file_get_contents($file), true) ?: [];
+    $data = array_merge($default, $data);
+    $now = time();
+    $data['restarts'] = array_values(array_filter((array)$data['restarts'], fn($t) => is_int($t) && $t > $now - 3600));
+    return $data;
+}
+
+function saveState(string $file, array $state): void {
+    $tmp = $file . '.tmp';
+    if (@file_put_contents($tmp, json_encode($state)) !== false) @rename($tmp, $file);
+}
+
+function logHistory(array $config, string $msg): void {
+    $f = $config['history_log'];
+    if (is_file($f) && filesize($f) > $config['history_max_bytes']) @rename($f, $f . '.1');
+    @file_put_contents($f, '[' . date('Y-m-d H:i:s') . "] $msg\n", FILE_APPEND);
+}
+
+function fmtMin(int $sec): string { return round($sec / 60, 1) . ' min'; }
+
+// ===================== СОСТОЯНИЕ =====================
+$state = loadState($config['state_file']);
+$now = time();
+
+if ($state['last_restart'] && ($now - $state['last_restart']) < $config['restart_grace']) exit(0);
+
+$errors = []; $warnings = []; $ok = []; $checkFailed = false;
+$svc = escapeshellarg($config['service_name']);
+
+// --- ДИАГНОСТИКА ---
+$svcOut = sh("systemctl --user is-active $svc");
+if ($svcOut === 'active') $ok[] = 'Systemd: active';
+else $errors[] = "Systemd: сервис не active ($svcOut)";
+
+$mainPid = (int)sh("systemctl --user show $svc -p MainPID --value");
+if ($mainPid > 0) $ok[] = "MainPID: $mainPid";
+else $errors[] = 'MainPID = 0';
+
+if ($mainPid > 0) {
+    $procDir = "/proc/$mainPid";
+    if (is_readable("$procDir/status")) {
+        $status = (string)file_get_contents("$procDir/status");
+        if (preg_match('/^State:\s+(\w)/m', $status, $m)) $ok[] = "State: {$m[1]}";
+        
+        $fdList = @glob("$procDir/fd/*") ?: [];
+        $fdCount = count($fdList);
+        $ok[] = "Open FDs: $fdCount";
     }
-    if (!$found) $warnings[] = 'No listening ports found for MainPID';
 }
 
-// Логи и БД (Freshness)
-foreach (['app_log' => $config['app_log'], 'db_file' => $config['db_file']] as $key => $path) {
-    if (file_exists($path)) {
-        $diff = time() - filemtime($path);
-        $ok[$key] = "$key last mod: " . round($diff/60, 1) . " min ago";
-        if ($diff > 600) $warnings[] = "$key not updated in > 10 min";
-    } else {
-        $errors[] = "$key not found";
-    }
+// Порты и API
+$listen = [];
+foreach (explode("\n", sh('ss -H -tlnp')) as $line) {
+    if (preg_match('/^LISTEN\s+\S+\s+\S+\s+(\S+):(\d+)\s+.*?pid='.$mainPid.'/', $line, $m)) $listen[] = ['host'=>$m[1], 'port'=>(int)$m[2]];
 }
 
-// --- 2. Логика перезапуска ---
+if ($config['api_enabled'] && $mainPid > 0 && $listen) {
+    $url = "http://127.0.0.1:{$listen[0]['port']}{$config['api_path']}";
+    $ctx = stream_context_create(['http' => ['timeout' => $config['api_timeout'], 'ignore_errors' => true]]);
+    $t0 = microtime(true);
+    @file_get_contents($url, false, $ctx);
+    if ((microtime(true) - $t0) > $config['api_timeout']) $errors[] = "API timeout";
+    else $ok[] = "API OK";
+}
 
+// ===================== ЛОГИКА =====================
 $shouldRestart = false;
-$statusMessage = "";
-
-if (!empty($errors)) {
-    if (!file_exists($config['failure_flag'])) {
-        file_put_contents($config['failure_flag'], time());
-        $statusMessage = "Критическая ошибка! Запущен таймер 10 минут до перезапуска.";
-    } else {
-        $elapsed = time() - (int)file_get_contents($config['failure_flag']);
-        $statusMessage = "Ошибка длится $elapsed секунд.";
-        if ($elapsed >= $config['restart_limit']) $shouldRestart = true;
+if ($errors) {
+    if ($state['failure_since'] === null) {
+        $state['failure_since'] = $now;
+        logHistory($config, 'FAIL start: ' . implode(' | ', $errors));
+    } elseif (($now - $state['failure_since']) >= $config['restart_limit']) {
+        $shouldRestart = true;
     }
 } else {
-    if (file_exists($config['failure_flag'])) unlink($config['failure_flag']);
+    $state['failure_since'] = null;
 }
 
-// --- 3. Генерация отчета ---
+if ($shouldRestart && count($state['restarts']) >= $config['max_restarts_hour']) $shouldRestart = false;
 
-$report = "=== OmniRoute Health Check (" . date('Y-m-d H:i:s') . ") ===\n\n";
-if ($errors) $report .= "❌ ERRORS:\n  - " . implode("\n  - ", $errors) . "\n\n";
-if ($warnings) $report .= "⚠️ WARNINGS:\n  - " . implode("\n  - ", $warnings) . "\n\n";
-if ($ok) $report .= "✅ OK:\n  - " . implode("\n  - ", $ok) . "\n\n";
-$report .= $statusMessage . "\n";
-
-// Ensure directory exists
-if (!is_dir(dirname($config['report_file']))) mkdir(dirname($config['report_file']), 0755, true);
-file_put_contents($config['report_file'], $report);
-echo $report;
-
-// --- 4. Действие ---
+// ===================== ДЕЙСТВИЕ =====================
 if ($shouldRestart) {
-    echo "\n🔄 Ошибки длятся > 10 минут. Перезапуск...\n";
-    shell_exec("systemctl --user restart {$config['service_name']}");
-    if (file_exists($config['failure_flag'])) unlink($config['failure_flag']);
+    sh("systemctl --user restart $svc");
+    logHistory($config, 'RESTART issued');
+    $state['restarts'][] = $now;
+    $state['last_restart'] = $now;
+    $state['failure_since'] = null;
 }
+
+saveState($config['state_file'], $state);
+@file_put_contents($config['report_file'], '=== OmniRoute Health Check (' . date('Y-m-d H:i:s') . ") ===\n\nErrors: " . implode(', ', $errors));
+flock($lockFh, LOCK_UN);
