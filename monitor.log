@@ -1,0 +1,270 @@
+=== OmniRoute Health Check (2026-11-25 04:51:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.2 min ago
+  - db_file last mod: 2.5 min ago
+
+Критическая ошибка! Запущен таймер 10 минут до перезапуска.
+=== OmniRoute Health Check (2026-11-25 04:52:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 1.2 min ago
+  - db_file last mod: 3.5 min ago
+
+Ошибка длится 60 секунд.
+=== OmniRoute Health Check (2026-11-25 04:53:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 2.2 min ago
+  - db_file last mod: 4.5 min ago
+
+Ошибка длится 120 секунд.
+=== OmniRoute Health Check (2026-11-25 04:54:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.5 min ago
+  - db_file last mod: 0.5 min ago
+
+Ошибка длится 180 секунд.
+=== OmniRoute Health Check (2026-11-25 04:55:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 1.5 min ago
+  - db_file last mod: 1.5 min ago
+
+Ошибка длится 240 секунд.
+=== OmniRoute Health Check (2026-11-25 04:56:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0 min ago
+  - db_file last mod: 2.5 min ago
+
+Ошибка длится 300 секунд.
+=== OmniRoute Health Check (2026-11-25 04:57:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.5 min ago
+  - db_file last mod: 3.5 min ago
+
+Ошибка длится 360 секунд.
+=== OmniRoute Health Check (2026-11-25 04:58:02) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.1 min ago
+  - db_file last mod: 4.5 min ago
+
+Ошибка длится 421 секунд.
+=== OmniRoute Health Check (2026-11-25 04:59:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.4 min ago
+  - db_file last mod: 0.4 min ago
+
+Ошибка длится 480 секунд.
+=== OmniRoute Health Check (2026-11-25 05:00:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.5 min ago
+  - db_file last mod: 1.4 min ago
+
+Ошибка длится 540 секунд.
+=== OmniRoute Health Check (2026-11-25 05:01:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.1 min ago
+  - db_file last mod: 2.4 min ago
+
+Ошибка длится 600 секунд.
+
+🔄 Ошибки длятся > 10 минут. Перезапуск...
+Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+=== OmniRoute Health Check (2026-11-25 05:02:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 1.1 min ago
+  - db_file last mod: 3.4 min ago
+
+Критическая ошибка! Запущен таймер 10 минут до перезапуска.
+=== OmniRoute Health Check (2026-11-25 05:03:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0 min ago
+  - db_file last mod: 4.4 min ago
+
+Ошибка длится 60 секунд.
+=== OmniRoute Health Check (2026-11-25 05:04:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.1 min ago
+  - db_file last mod: 0.4 min ago
+
+Ошибка длится 120 секунд.
+=== OmniRoute Health Check (2026-11-25 05:05:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.1 min ago
+  - db_file last mod: 0.7 min ago
+
+Ошибка длится 180 секунд.
+=== OmniRoute Health Check (2026-11-25 05:06:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.2 min ago
+  - db_file last mod: 1.7 min ago
+
+Ошибка длится 240 секунд.
+=== OmniRoute Health Check (2026-11-25 05:07:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 1.2 min ago
+  - db_file last mod: 2.7 min ago
+
+Ошибка длится 300 секунд.
+=== OmniRoute Health Check (2026-11-25 05:08:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 2.2 min ago
+  - db_file last mod: 3.7 min ago
+
+Ошибка длится 360 секунд.
+=== OmniRoute Health Check (2026-11-25 05:09:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.4 min ago
+  - db_file last mod: 0.4 min ago
+
+Ошибка длится 420 секунд.
+=== OmniRoute Health Check (2026-11-25 05:10:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0 min ago
+  - db_file last mod: 1.4 min ago
+
+Ошибка длится 480 секунд.
+=== OmniRoute Health Check (2026-11-25 05:11:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.1 min ago
+  - db_file last mod: 2.4 min ago
+
+Ошибка длится 540 секунд.
+=== OmniRoute Health Check (2026-11-25 05:12:01) ===
+
+❌ ERRORS:
+  - Systemd service not active: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+  - Cannot determine MainPID
+  - Process not found at /proc/PID
+
+✅ OK:
+  - app_log last mod: 0.3 min ago
+  - db_file last mod: 0.4 min ago
+
+Ошибка длится 600 секунд.
+
+🔄 Ошибки длятся > 10 минут. Перезапуск...
+Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
